@@ -96,9 +96,15 @@ get_config() {
     # Convert dot notation to jq path: "generation.thinking" -> ".generation.thinking"
     local jq_path=".${key}"
     local value
-    value=$(jq -r "$jq_path // empty" "$CONFIG_FILE" 2>/dev/null)
+    # Don't use // operator as it treats boolean false as falsy
+    value=$(jq -r "$jq_path" "$CONFIG_FILE" 2>/dev/null)
     # Remove any trailing whitespace/newlines (Windows compatibility)
-    echo "$value" | tr -d '\r\n'
+    # Return empty string if value is "null" (key doesn't exist)
+    if [ "$value" = "null" ]; then
+        echo ""
+    else
+        echo "$value" | tr -d '\r\n'
+    fi
 }
 
 # Normalize boolean value for jq --argjson

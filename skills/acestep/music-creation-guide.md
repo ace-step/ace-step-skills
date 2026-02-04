@@ -348,19 +348,3 @@ THIS IS OUR MOMENT!
 Note: In this example, Lyrics tags (piano, powerful, whispered) are consistent with Caption descriptions (piano ballad, building to powerful chorus, intimate), with no conflicts.
 
 ---
-
-## Summary Checklist
-
-Before generating music, check:
-
-- ✅ **Caption**: Describes style, instruments, emotion, atmosphere clearly
-- ✅ **Lyrics**: Complete with all verses/choruses/bridges, proper structure tags
-- ✅ **Consistency**: Caption and Lyrics don't conflict
-- ✅ **Duration**: Calculated based on lyrics length (~3-5 seconds per line + intro/outro)
-- ✅ **BPM**: Matches the genre and mood
-- ✅ **Time Signature**: Appropriate for the style
-- ✅ **Metadata**: Don't include tempo/BPM/key in Caption, use dedicated parameters
-
----
-
-*Source: ACE-Step 1.5 Ultimate Guide*
