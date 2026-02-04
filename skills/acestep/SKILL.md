@@ -8,6 +8,13 @@ allowed-tools: Read, Write, Bash
 
 Use ACE-Step V1.5 API for music generation. Script: `scripts/acestep.sh` (requires curl + jq).
 
+**WORKFLOW**: For user requests requiring vocals, you should:
+1. Consult [Music Creation Guide](./music-creation-guide.md) for lyrics writing, caption creation, duration/BPM/key selection
+2. Write complete, well-structured lyrics yourself based on the guide
+3. Generate using Caption mode with `-c` and `-l` parameters
+
+Only use Simple/Random mode (`-d` or `random`) for quick inspiration or instrumental exploration.
+
 ## Output Files
 
 After generation, the script automatically saves results to the `acestep_output` folder in the project root (same level as `.claude`):
@@ -43,33 +50,40 @@ project_root/
 | `dit_model` | DiT model name |
 
 To get the actual synthesized lyrics, parse the JSON and read the top-level `lyrics` field, not `metas.lyrics`.
+
 ## Script Commands
+
+**CRITICAL - Complete Lyrics Input**: When providing lyrics via the `-l` parameter, you MUST pass ALL lyrics content WITHOUT any omission:
+- If user provides lyrics, pass the ENTIRE text they give you
+- If you generate lyrics yourself, pass the COMPLETE lyrics you created
+- NEVER truncate, shorten, or pass only partial lyrics
+- Missing lyrics will result in incomplete or incoherent songs
+
+**Music Parameters**: Refer to [Music Creation Guide](./music-creation-guide.md) for how to calculate duration, choose BPM, key scale, and time signature.
 
 ```bash
 # need to cd skills path
 cd {project_root}/{.claude or .codex}/skills/acestep/
 
-# Caption mode - directly specify music style
-./scripts/acestep.sh generate "Pop music with guitar"
-./scripts/acestep.sh generate -c "Lyrical pop" -l "[Verse] Lyrics here"
+# Caption mode - RECOMMENDED: Write lyrics first, then generate
+./scripts/acestep.sh generate -c "Electronic pop, energetic synths" -l "[Verse] Your complete lyrics
+[Chorus] Full chorus here..." --duration 120 --bpm 128
 
-# Simple mode - LM generates caption/lyrics from description
+# Instrumental only
+./scripts/acestep.sh generate "Jazz with saxophone"
+
+# Quick exploration (Simple/Random mode)
 ./scripts/acestep.sh generate -d "A cheerful song about spring"
-
-# Random mode - LM generates everything randomly
 ./scripts/acestep.sh random
 
 # Options
-./scripts/acestep.sh generate "Jazz" --no-thinking    # Disable LM (faster)
-./scripts/acestep.sh generate "EDM" --duration 60     # Set duration
-./scripts/acestep.sh generate "Rock" --batch 2        # Generate 2 versions
+./scripts/acestep.sh generate "Rock" --duration 60 --batch 2
+./scripts/acestep.sh generate "EDM" --no-thinking    # Faster
 
 # Other commands
-./scripts/acestep.sh status <job_id>         # Check status & download
-./scripts/acestep.sh health                  # Check API
-./scripts/acestep.sh models                  # List models
-./scripts/acestep.sh config --list           # Show config
-./scripts/acestep.sh config --set api_url http://host:port
+./scripts/acestep.sh status <job_id>
+./scripts/acestep.sh health
+./scripts/acestep.sh models
 ```
 
 ## Configuration
@@ -88,9 +102,9 @@ cd {project_root}/{.claude or .codex}/skills/acestep/
   "api_key": "",
   "generation": {
     "thinking": true,
-    "use_format": true,
+    "use_format": false,
     "use_cot_caption": true,
-    "use_cot_language": true,
+    "use_cot_language": false,
     "batch_size": 1,
     "audio_format": "mp3",
     "vocal_language": "en"
@@ -138,18 +152,18 @@ Parameters can be placed in `param_obj` object.
 
 ### Generation Modes
 
-| Mode | Condition | Description |
-|------|-----------|-------------|
-| **Caption** | `prompt` set, `sample_mode=false` | Directly specify music style |
-| **Simple** | `sample_mode=true` + `sample_query` not empty | LM generates caption/lyrics from description |
-| **Random** | `sample_mode=true` + `sample_query` empty | LM generates random caption/lyrics/metas |
+| Mode | Usage | When to Use |
+|------|-------|-------------|
+| **Caption** (Recommended) | `generate -c "style" -l "lyrics"` | For vocal songs - write lyrics yourself first |
+| **Simple** | `generate -d "description"` | Quick exploration, LM generates everything |
+| **Random** | `random` | Random generation for inspiration |
 
 ### Core Parameters
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `prompt` | string | "" | Music style description (Caption mode) |
-| `lyrics` | string | "" | Lyrics content, `[inst]` for instrumental |
+| `lyrics` | string | "" | **Full lyrics content** - Pass ALL lyrics without omission. Use `[inst]` for instrumental. Partial/truncated lyrics = incomplete songs |
 | `sample_mode` | bool | false | Enable Simple/Random mode |
 | `sample_query` | string | "" | Description for Simple mode |
 | `thinking` | bool | false | Enable 5Hz LM for audio code generation |
