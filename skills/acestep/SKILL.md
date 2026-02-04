@@ -23,6 +23,26 @@ project_root/
 │   └── ...
 └── ...
 ```
+
+### JSON Result Structure
+
+**Important**: When LM enhancement is enabled (`use_format=true`), the final synthesized content may differ from your input. Check the JSON file for actual values:
+
+| Field | Description |
+|-------|-------------|
+| `prompt` | **Actual caption** used for synthesis (may be LM-enhanced) |
+| `lyrics` | **Actual lyrics** used for synthesis (may be LM-enhanced) |
+| `metas.prompt` | Original input caption |
+| `metas.lyrics` | Original input lyrics |
+| `metas.bpm` | BPM used |
+| `metas.keyscale` | Key scale used |
+| `metas.duration` | Duration in seconds |
+| `generation_info` | Detailed timing and model info |
+| `seed_value` | Seeds used (for reproducibility) |
+| `lm_model` | LM model name |
+| `dit_model` | DiT model name |
+
+To get the actual synthesized lyrics, parse the JSON and read the top-level `lyrics` field, not `metas.lyrics`.
 ## Script Commands
 
 ```bash
