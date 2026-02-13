@@ -1,5 +1,5 @@
 {
-  "provider": "openai",
+  "provider": "elevenlabs",
   "output_format": "lrc",
   "openai": {
     "api_key": "",
