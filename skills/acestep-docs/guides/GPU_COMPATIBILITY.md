@@ -24,6 +24,84 @@ ACE-Step 1.5 automatically adapts to your GPU's available VRAM, adjusting genera
 - For GPUs with ≤6GB VRAM, LM initialization is disabled by default to preserve memory for the DiT model
 - You can manually override settings via command-line arguments or the Gradio UI
 
+## Overriding LLM Initialization
+
+By default, LLM is auto-enabled/disabled based on GPU VRAM. You can override this behavior.
+
+**Important:** GPU optimizations (offload, quantization, batch limits) are **always applied** regardless of override. `ACESTEP_INIT_LLM` only controls whether to attempt LLM loading.
+
+### Processing Flow
+
+```
+GPU Detection (full)  →  ACESTEP_INIT_LLM Override  →  Model Loading
+     │                          │                          │
+     ├─ offload settings        ├─ auto: use GPU result    ├─ Download model
+     ├─ batch limits            ├─ true: force enable      ├─ Initialize LLM
+     ├─ duration limits         └─ false: force disable    └─ (with GPU settings)
+     └─ recommended models
+```
+
+### Gradio UI
+
+```bash
+# Force enable LLM (may cause OOM on low VRAM)
+uv run acestep --init_llm true
+
+# Force disable LLM (pure DiT mode)
+uv run acestep --init_llm false
+```
+
+Or in `start_gradio_ui.bat`:
+```batch
+set INIT_LLM=--init_llm true
+```
+
+### API Server
+
+Using environment variable:
+```bash
+# Auto mode (recommended)
+set ACESTEP_INIT_LLM=auto
+uv run acestep-api
+
+# Force enable LLM
+set ACESTEP_INIT_LLM=true
+uv run acestep-api
+
+# Force disable LLM
+set ACESTEP_INIT_LLM=false
+uv run acestep-api
+```
+
+Or using command line:
+```bash
+uv run acestep-api --init-llm
+```
+
+Or in `start_api_server.bat`:
+```batch
+set ACESTEP_INIT_LLM=true
+```
+
+### When to Override
+
+| Scenario | Setting | Notes |
+|----------|---------|-------|
+| Low VRAM but need thinking mode | `true` | May cause OOM, use with caution |
+| Fast generation without CoT | `false` | Skips LLM, uses pure DiT |
+| API server pure DiT mode | `false` | Faster responses, simpler setup |
+| High VRAM but want minimal setup | `false` | No LLM model download needed |
+
+### Features Affected by LLM
+
+When LLM is disabled, these features are automatically disabled:
+- **Thinking mode** (`thinking=true`)
+- **CoT caption/language detection** (`use_cot_caption`, `use_cot_language`)
+- **Sample mode** (generate from description)
+- **Format mode** (LLM-enhanced input)
+
+The API server will automatically fallback to pure DiT mode when these features are requested but LLM is unavailable.
+
 > **Community Contributions Welcome**: The GPU tier configurations above are based on our testing across common hardware. If you find that your device's actual performance differs from these parameters (e.g., can handle longer durations or larger batch sizes), we welcome you to conduct more thorough testing and submit a PR to optimize these configurations in `acestep/gpu_config.py`. Your contributions help improve the experience for all users!
 
 ## Memory Optimization Tips
