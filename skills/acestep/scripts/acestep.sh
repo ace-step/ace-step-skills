@@ -514,12 +514,12 @@ get_completion_model() {
     local user_model="$2"
     local api_key=$(load_api_key)
 
-    # If user specified a model, prefix with acestep/ if needed
+    # If user specified a model, prefix with acemusic/ if needed
     if [ -n "$user_model" ]; then
         if [[ "$user_model" == */* ]]; then
             echo "$user_model"
         else
-            echo "acestep/${user_model}"
+            echo "acemusic/${user_model}"
         fi
         return
     fi
@@ -534,7 +534,7 @@ get_completion_model() {
 
     local model_id
     model_id=$(echo "$response" | jq -r '.data[0].id // empty' 2>/dev/null)
-    echo "${model_id:-acestep/ACE-Step-v1.5}"
+    echo "${model_id:-acemusic/acestep-v15-turbo}"
 }
 
 # Decode base64 audio data URL and save to file

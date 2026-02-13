@@ -178,9 +178,17 @@ If jq is not installed, the script will attempt to install it automatically. If 
 
 ### Service Configuration
 
-**Local Service (Default):** No configuration needed.
+**Official Cloud API:** ACE-Step provides an official API endpoint at `https://api.acemusic.ai`. To use it:
+```bash
+./scripts/acestep.sh config --set api_url "https://api.acemusic.ai"
+./scripts/acestep.sh config --set api_key "your-key"
+./scripts/acestep.sh config --set api_mode completion
+```
+API keys are currently available through the official ACE-Step Discord community. Additional distribution methods will be added in the future.
 
-**Remote Service:** Update `scripts/config.json` or use:
+**Local Service (Default):** No configuration needed — connects to `http://127.0.0.1:8001`.
+
+**Custom Remote Service:** Update `scripts/config.json` or use:
 ```bash
 ./scripts/acestep.sh config --set api_url "http://remote-server:8001"
 ./scripts/acestep.sh config --set api_key "your-key"

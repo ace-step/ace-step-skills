@@ -71,7 +71,26 @@ function findBrowserExecutable(cliOverride) {
   const platform = process.platform;
   const home = homedir();
 
-  // 3. Remotion cache (chrome-headless-shell) — uses --headless=old
+  // 3. Local node_modules/.remotion (chrome-headless-shell) — uses --headless=old
+  const localCacheDir = join(process.cwd(), 'node_modules', '.remotion', 'chrome-headless-shell');
+  if (existsSync(localCacheDir)) {
+    try {
+      // Structure: chrome-headless-shell/linux64/chrome-headless-shell-linux64/chrome-headless-shell
+      const platformDir = platform === 'win32' ? 'win64' : platform === 'darwin' ? 'mac-arm64' : 'linux64';
+      const exeName = platform === 'win32' ? 'chrome-headless-shell.exe' : 'chrome-headless-shell';
+      const platformPath = join(localCacheDir, platformDir);
+
+      if (existsSync(platformPath)) {
+        const subdirs = readdirSync(platformPath);
+        for (const subdir of subdirs) {
+          const exe = join(platformPath, subdir, exeName);
+          if (existsSync(exe)) return {path: exe, chromeMode: 'headless-shell'};
+        }
+      }
+    } catch {}
+  }
+
+  // 4. User home Remotion cache (chrome-headless-shell) — uses --headless=old
   let cacheDir;
   if (platform === 'win32') {
     cacheDir = join(home, 'AppData', 'Local', 'remotion', 'chrome-headless-shell');
