@@ -162,19 +162,38 @@ If jq is not installed, the script will attempt to install it automatically. If 
 
 ### Before First Use
 
-**Ask the user about their setup:**
+**You MUST check the API key and URL status before proceeding.** Run:
 
-1. **"Do you have ACE-Step API service configured and running?"**
+```bash
+cd "{project_root}/{.claude or .codex}/skills/acestep/" && bash ./scripts/acestep.sh config --check-key
+cd "{project_root}/{.claude or .codex}/skills/acestep/" && bash ./scripts/acestep.sh config --get api_url
+```
 
-   If **YES**:
-   - Verify the API endpoint: `./scripts/acestep.sh health`
-   - If using remote service, ask for the API URL and update `scripts/config.json`
-   - Proceed with music generation
+#### Case 1: Using Official Cloud API (`https://api.acemusic.ai`) without API key
 
-   If **NO** or **NOT SURE**:
-   - Ask: "Do you have ACE-Step installed?"
-   - **If installed but not running**: Use the acestep-docs skill to help them start the service
-   - **If not installed**: Use acestep-docs skill to guide through installation
+If `api_url` is `https://api.acemusic.ai` and `api_key` is `empty`, you MUST stop and guide the user to configure their key:
+
+1. Tell the user: "You're using the ACE-Step official cloud API, but no API key is configured. An API key is required to use this service."
+2. Explain how to get a key: API keys are currently available through the official ACE-Step Discord community (https://discord.gg/bGVxwUyD). Additional distribution methods will be added in the future.
+3. Use `AskUserQuestion` to ask the user to provide their API key.
+4. Once provided, configure it:
+   ```bash
+   cd "{project_root}/{.claude or .codex}/skills/acestep/" && bash ./scripts/acestep.sh config --set api_key <KEY>
+   ```
+5. Additionally, inform the user: "If you also want to render music videos (MV), it's recommended to configure a lyrics transcription API key as well (OpenAI Whisper or ElevenLabs Scribe), so that lyrics can be automatically transcribed with accurate timestamps. You can configure it later via the `lyrics-transcription` skill."
+
+#### Case 2: API key is configured
+
+Verify the API endpoint: `./scripts/acestep.sh health` and proceed with music generation.
+
+#### Case 3: Using local/custom API without key
+
+Local services (`http://127.0.0.1:*`) typically don't require a key. Verify with `./scripts/acestep.sh health` and proceed.
+
+If health check fails:
+- Ask: "Do you have ACE-Step installed?"
+- **If installed but not running**: Use the acestep-docs skill to help them start the service
+- **If not installed**: Use acestep-docs skill to guide through installation
 
 ### Service Configuration
 

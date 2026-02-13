@@ -18,10 +18,12 @@ cd "{project_root}/{.claude or .codex}/skills/lyrics-transcription/" && bash ./s
 
 This command only reports whether the active provider's API key is set or empty — it does NOT print the actual key value. **NEVER read or display the user's API key content.** Do not use `config --get` on key fields or read `config.json` directly. The `config --list` command is safe — it automatically masks API keys as `***` in output.
 
-**If the command reports the key is empty**, you MUST guide the user to configure it before proceeding. Use `AskUserQuestion` to ask for their API key, with the following guidance:
+**If the command reports the key is empty**, you MUST stop and guide the user to configure it before proceeding. Do NOT attempt transcription without a valid key — it will fail.
 
-1. Tell the user which provider is currently active and that its API key is not configured.
-2. Ask the user to provide their API key, and briefly explain where to obtain one:
+Use `AskUserQuestion` to ask the user to provide their API key, with the following options and guidance:
+
+1. Tell the user which provider is currently active (openai or elevenlabs) and that its API key is not configured. Explain that transcription cannot proceed without it.
+2. Provide clear instructions on where to obtain a key:
    - **OpenAI**: Get an API key at https://platform.openai.com/api-keys — requires an OpenAI account with billing enabled. The Whisper API costs ~$0.006/min.
    - **ElevenLabs**: Get an API key at https://elevenlabs.io/app/settings/api-keys — requires an ElevenLabs account. Free tier includes limited credits.
 3. Also offer the option to switch to the other provider if they already have a key for it.
@@ -33,6 +35,7 @@ This command only reports whether the active provider's API key is set or empty 
    ```bash
    cd "{project_root}/{.claude or .codex}/skills/lyrics-transcription/" && bash ./scripts/lyrics-transcription.sh config --set provider <provider_name>
    ```
+6. After configuring, re-run `config --check-key` to verify the key is set before proceeding.
 
 **If the API key is already configured**, proceed directly to transcription without asking.
 

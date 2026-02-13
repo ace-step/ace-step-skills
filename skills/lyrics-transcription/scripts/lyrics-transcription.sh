@@ -84,7 +84,15 @@ DEFAULT_CONFIG='{
 
 ensure_config() {
     if [ ! -f "$CONFIG_FILE" ]; then
-        echo "$DEFAULT_CONFIG" > "$CONFIG_FILE"
+        local example="${CONFIG_FILE}.example"
+        if [ -f "$example" ]; then
+            cp "$example" "$CONFIG_FILE"
+            echo -e "${YELLOW}Config file created from config.json.example. Please configure your settings:${NC}"
+            echo -e "  ${CYAN}./scripts/lyrics-transcription.sh config --set provider <openai|elevenlabs>${NC}"
+            echo -e "  ${CYAN}./scripts/lyrics-transcription.sh config --set <provider>.api_key <key>${NC}"
+        else
+            echo "$DEFAULT_CONFIG" > "$CONFIG_FILE"
+        fi
     fi
 }
 
