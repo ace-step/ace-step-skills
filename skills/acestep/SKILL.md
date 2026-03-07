@@ -64,7 +64,12 @@ cd {project_root}/{.claude or .codex}/skills/acestep/
 ./scripts/acestep.sh generate -d "A cheerful song about spring"
 ./scripts/acestep.sh random
 
-# Options
+# Cover / Repainting from source audio
+./scripts/acestep.sh cover song.mp3 -c "Rock cover style" -l "[Verse] Lyrics..." --duration 120 --bpm 128
+./scripts/acestep.sh generate --src-audio song.mp3 --task-type repaint -c "Pop" --repaint-start 30 --repaint-end 60
+
+# Music attribute options
+./scripts/acestep.sh generate "Rock" --duration 60 --bpm 120 --key-scale "C major" --time-sig "4/4"
 ./scripts/acestep.sh generate "Rock" --duration 60 --batch 2
 ./scripts/acestep.sh generate "EDM" --no-thinking    # Faster
 
@@ -73,6 +78,29 @@ cd {project_root}/{.claude or .codex}/skills/acestep/
 ./scripts/acestep.sh health
 ./scripts/acestep.sh models
 ```
+
+### Cover / Audio Repainting
+
+The `cover` command generates music based on a source audio file. The audio is base64-encoded and sent to the API.
+
+```bash
+# Cover: regenerate with new style/lyrics, preserving melody structure
+./scripts/acestep.sh cover input.mp3 -c "Jazz cover" -l "[Verse] New lyrics..." --duration 120
+
+# Repainting: modify a specific region of the audio
+./scripts/acestep.sh generate --src-audio input.mp3 --task-type repaint -c "Pop ballad" --repaint-start 30 --repaint-end 90
+
+# Cover options
+#   --src-audio         Source audio file path
+#   --task-type         cover (default with --src-audio), repaint, text2music
+#   --cover-strength    0.0-1.0 (default: 1.0, higher = closer to source)
+#   --repaint-start     Repainting start position (seconds)
+#   --repaint-end       Repainting end position (seconds)
+#   --key-scale         Musical key (e.g. "E minor")
+#   --time-signature    Time signature (e.g. "4/4")
+```
+
+**Note**: For cloud API usage, large audio files may be rejected by Cloudflare. Compress audio before uploading if needed (e.g. using ffmpeg: `ffmpeg -i input.mp3 -b:a 64k -ar 24000 -ac 1 compressed.mp3`).
 
 ## Output Files
 
